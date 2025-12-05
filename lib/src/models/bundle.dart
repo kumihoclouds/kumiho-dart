@@ -17,7 +17,16 @@ import 'revision.dart';
 ///
 /// Bundles are special items (kind="bundle") that can contain references
 /// to other items. They provide a way to group related assets together
-/// and maintain an audit trail of membership changes.
+/// and maintain an audit trail of membership changes. Bundles are
+/// first-class model objects—they expose rich helper methods without
+/// requiring the consumer to touch protobuf-generated stubs.
+///
+/// Practical scenarios include:
+/// - Packaging the set of approved assets for a release.
+/// - Tracking episodic or level-based deliveries without duplicating the
+///   underlying items.
+/// - Capturing metadata on the membership relationship (e.g., role,
+///   variant, platform) for downstream automation.
 ///
 /// ```dart
 /// final bundle = await project.createBundle('release-v1');
@@ -84,8 +93,11 @@ class Bundle extends KumihoObject {
 
   /// Adds a member to this bundle.
   ///
+  /// The optional [metadata] map is attached to the membership edge and
+  /// can later be inspected via [getMembershipHistory].
+  ///
   /// ```dart
-  /// await bundle.addMember(hero.kref);
+  /// await bundle.addMember(hero.kref, metadata: {'role': 'hero'});
   /// ```
   Future<void> addMember(Kref memberKref, {Map<String, String>? metadata}) async {
     await client.addBundleMember(kref.uri, memberKref.uri, metadata: metadata);
@@ -120,6 +132,9 @@ class Bundle extends KumihoObject {
 
   /// Gets all current members of this bundle.
   ///
+  /// Returns the krefs of the linked items, allowing callers to lazily
+  /// hydrate the items only when needed.
+  ///
   /// ```dart
   /// final members = await bundle.getMembers();
   /// for (final member in members) {
@@ -133,7 +148,9 @@ class Bundle extends KumihoObject {
 
   /// Gets the membership history for a specific member.
   ///
-  /// Returns the history of when the member was added/removed from this bundle.
+  /// Returns the history of when the member was added/removed from this
+  /// bundle, including the metadata captured at each change. This is
+  /// useful for audits and debugging automation.
   ///
   /// ```dart
   /// final history = await bundle.getMembershipHistory(hero.kref);
@@ -143,6 +160,8 @@ class Bundle extends KumihoObject {
   }
 
   /// Creates a new revision of this bundle.
+  ///
+  /// The resulting [Revision] captures the current membership snapshot.
   ///
   /// ```dart
   /// final v1 = await bundle.createRevision(metadata: {'notes': 'Initial release'});

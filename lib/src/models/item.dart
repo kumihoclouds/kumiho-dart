@@ -15,7 +15,10 @@ import 'revision.dart';
 /// A versioned asset in the Kumiho system.
 ///
 /// Items represent assets that can have multiple revisions, such as 3D models,
-/// textures, workflows, or any other type of creative content.
+/// textures, workflows, or any other type of creative content. They are the
+/// main entry-point for client tools: each API in this class returns a
+/// high-level model object rather than the protobuf response so dartdoc can
+/// generate user-facing documentation without exposing transport details.
 ///
 /// ```dart
 /// final item = await kumiho.getItem('kref://my-project/models/hero.model');
@@ -83,6 +86,9 @@ class Item extends KumihoObject {
 
   /// Gets the parent space of this item.
   ///
+  /// Returns the [Space] model for the kref path. The returned object is
+  /// the high-level wrapper, not the protobuf payload.
+  ///
   /// ```dart
   /// final parentSpace = await item.space;
   /// ```
@@ -114,7 +120,9 @@ class Item extends KumihoObject {
 
   /// Gets the latest revision of this item.
   ///
-  /// Returns `null` if no revisions exist.
+  /// Returns `null` if no revisions exist. The helper swallows the
+  /// "not found" response from the control plane and surfaces a
+  /// nullable [Revision] wrapper instead of throwing.
   ///
   /// ```dart
   /// final latest = await item.getLatestRevision();

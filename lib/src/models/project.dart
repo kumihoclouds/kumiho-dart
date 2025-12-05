@@ -17,7 +17,9 @@ import 'bundle.dart';
 ///
 /// Projects are the root of the Kumiho hierarchy. Each project has its own
 /// namespace for spaces and items, and manages access control and settings
-/// independently.
+/// independently. The [Project] class exposes ergonomic helpers for creating
+/// and listing model-layer entities without exposing the protobuf surfaces
+/// that back the gRPC transport.
 ///
 /// ```dart
 /// final project = await kumiho.getProject('my-project');
@@ -127,7 +129,9 @@ class Project extends KumihoObject {
 
   /// Gets all child spaces of this project.
   ///
-  /// If [recursive] is true, returns all spaces in the hierarchy.
+  /// If [recursive] is true, traverses the entire space tree depth-first
+  /// and returns every space as a high-level [Space] model. This keeps the
+  /// caller insulated from the raw gRPC paging responses.
   ///
   /// ```dart
   /// final spaces = await project.getSpaces();

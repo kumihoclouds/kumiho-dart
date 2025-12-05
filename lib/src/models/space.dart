@@ -16,7 +16,9 @@ import 'bundle.dart';
 ///
 /// Spaces form the folder structure within a project. They can contain
 /// other spaces (subspaces) and items, allowing you to organize assets
-/// in a meaningful hierarchy.
+/// in a meaningful hierarchy. The SDK exposes navigation helpers here so
+/// callers can traverse the project tree without importing any of the
+/// generated protobuf code.
 ///
 /// ```dart
 /// final assets = await project.createSpace('assets');
@@ -88,6 +90,8 @@ class Space extends KumihoObject {
 
   /// Creates a new subspace within this space.
   ///
+  /// Returns the high-level [Space] wrapper for the newly-created node.
+  ///
   /// ```dart
   /// final models = await assets.createSpace('models');
   /// ```
@@ -135,6 +139,9 @@ class Space extends KumihoObject {
 
   /// Gets all items in this space.
   ///
+  /// The optional [kindFilter] and [nameFilter] mirror the server-side
+  /// filtering semantics and still return the model-layer [Item] wrappers.
+  ///
   /// ```dart
   /// final items = await models.getItems();
   /// final textures = await assets.getItems(kindFilter: 'texture');
@@ -149,6 +156,10 @@ class Space extends KumihoObject {
   }
 
   /// Gets all child spaces of this space.
+  ///
+  /// When [recursive] is true, traverses the space tree depth-first to
+  /// return every descendant as a [Space] model. This mirrors
+  /// [Project.getSpaces] to keep navigation consistent.
   ///
   /// ```dart
   /// final children = await assets.getChildSpaces();
@@ -229,6 +240,9 @@ class Space extends KumihoObject {
   }
 
   /// Updates metadata for this space.
+  ///
+  /// The attributes are stored on the space path and immediately available
+  /// to other callers.
   ///
   /// ```dart
   /// await space.updateMetadata({'status': 'active'});

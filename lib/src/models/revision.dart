@@ -18,6 +18,9 @@ import 'edge.dart';
 /// Revisions are immutable snapshots of an item at a point in time. Each
 /// revision can have multiple artifacts (file references), tags for
 /// categorization, and edges to other revisions for dependency tracking.
+/// The class presents these capabilities through first-class Dart models so
+/// the API surface remains stable even if the underlying protobuf schema
+/// evolves.
 ///
 /// ```dart
 /// final revision = await kumiho.getRevision('kref://project/models/hero.model?r=1');
@@ -91,6 +94,10 @@ class Revision extends KumihoObject {
 
   /// Creates a new artifact for this revision.
   ///
+  /// Returns the high-level [Artifact] wrapper so callers can continue
+  /// working in the model layer. Use [metadata] to attach attributes during
+  /// creation (for example, format or render engine information).
+  ///
   /// ```dart
   /// final mesh = await revision.createArtifact('mesh', '/assets/hero.fbx');
   /// final tex = await revision.createArtifact('textures', '/assets/hero_tex.zip',
@@ -112,6 +119,9 @@ class Revision extends KumihoObject {
   }
 
   /// Gets an artifact by name.
+  ///
+  /// Resolves the artifact kref by combining [kref] and the name, then
+  /// returns the model wrapper.
   ///
   /// ```dart
   /// final mesh = await revision.getArtifact('mesh');
@@ -280,7 +290,10 @@ class Revision extends KumihoObject {
 
   /// Analyzes the impact of changes to this revision.
   ///
-  /// Returns all revisions that would be affected by changes to this revision.
+  /// Returns all revisions that would be affected by changes to this
+  /// revision. The response is the protobuf DTO because it contains
+  /// structured counts and graph paths, but the method signature keeps the
+  /// model-centric calling pattern consistent.
   ///
   /// ```dart
   /// final impact = await revision.analyzeImpact(maxDepth: 5);
