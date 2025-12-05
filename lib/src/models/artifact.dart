@@ -16,6 +16,16 @@ import 'base.dart';
 /// Artifacts are the leaf nodes of the Kumiho hierarchy. They point to
 /// actual files on local disk, network storage, or cloud URIs. Kumiho
 /// tracks the path and metadata but does not upload or modify the files.
+/// Instead, the SDK keeps the revision graph, attributes, and default
+/// selection in sync with the control plane so downstream tools can
+/// resolve the correct asset without pulling in protobuf stubs.
+///
+/// Typical uses include:
+/// - Referencing published geometry, textures, caches, or documents.
+/// - Promoting one artifact to the default for a revision so callers can
+///   omit the name when resolving a kref.
+/// - Attaching rich metadata (format, scale, pipeline stages) that can be
+///   inspected from automation without needing the raw gRPC response.
 ///
 /// ```dart
 /// final revision = await kumiho.getRevision('kref://project/models/hero.model?r=1');
@@ -82,6 +92,10 @@ class Artifact extends KumihoObject {
 
   /// Gets the parent revision of this artifact.
   ///
+  /// This is a convenience wrapper around [KumihoClient.getRevision] that
+  /// returns the high-level [Revision] model rather than the protobuf
+  /// payload.
+  ///
   /// ```dart
   /// final rev = await artifact.revision;
   /// ```
@@ -91,6 +105,9 @@ class Artifact extends KumihoObject {
 
   /// Sets this artifact as the default for its revision.
   ///
+  /// The default artifact is returned when a revision kref is resolved
+  /// without an explicit artifact name.
+  ///
   /// ```dart
   /// await mesh.setDefault();
   /// ```
@@ -99,6 +116,11 @@ class Artifact extends KumihoObject {
   }
 
   /// Sets metadata for this artifact.
+  ///
+  /// Each key/value is stored as an attribute on the artifact kref.
+  /// Metadata is immediately available to other SDK callers and in the
+  /// web console. Existing keys are overwritten; to remove a key, set its
+  /// value to an empty string.
   ///
   /// ```dart
   /// await artifact.setMetadata({
@@ -113,6 +135,8 @@ class Artifact extends KumihoObject {
   }
 
   /// Gets a metadata value by key.
+  ///
+  /// Returns `null` when the attribute is not set.
   ///
   /// ```dart
   /// final format = await artifact.getMetadataValue('format');

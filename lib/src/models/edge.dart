@@ -15,7 +15,9 @@ import 'base.dart';
 ///
 /// Edges track dependencies, derivations, and references between revisions.
 /// They form a directed graph that can be traversed to understand asset
-/// relationships and impact analysis.
+/// relationships and impact analysis. The Dart SDK exposes edges as a
+/// lightweight model object so dependency graph tooling can be built
+/// without importing generated protobuf types.
 ///
 /// ```dart
 /// // Create an edge
@@ -61,6 +63,10 @@ class Edge extends KumihoObject {
   late final String username;
 
   /// Deletes this edge.
+  ///
+  /// This removes the relationship between [sourceKref] and [targetKref]
+  /// for the stored [edgeType]. Metadata captured on the edge is also
+  /// removed.
   ///
   /// ```dart
   /// await edge.delete();

@@ -193,11 +193,13 @@ class KumihoClient extends KumihoClientBase
           secure: secure,
         );
 
-  // ============================================================
-  // High-Level Model API
-  // ============================================================
-  // These methods return rich model objects with fluent APIs,
-  // similar to the Python SDK's interface.
+// ============================================================
+// High-Level Model API
+// ============================================================
+// These helpers intentionally wrap protobuf responses in rich model
+// objects so consumers rarely need to touch the generated gRPC stubs.
+// The fluent API mirrors the Python SDK, making it easy to script
+// common asset-management workflows without wrestling with wire types.
 
   /// Creates a new project and returns a [Project] model.
   ///

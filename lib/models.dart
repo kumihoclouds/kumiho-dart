@@ -6,6 +6,11 @@
 /// This module exports all high-level domain objects that provide
 /// a fluent, Pythonic API for interacting with Kumiho.
 ///
+/// The symbols exported here are the ones surfaced in generated
+/// `dartdoc` output. They wrap the underlying protobuf messages and
+/// expose ergonomic methods instead of raw RPC stubs, so integrators
+/// can stay in the model layer when building applications or tooling.
+///
 /// ```dart
 /// import 'package:kumiho/models.dart';
 ///
