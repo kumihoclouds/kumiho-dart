@@ -41,9 +41,11 @@ abstract class KumihoClientBase {
 ///
 /// This abstract base class provides common functionality shared by all
 /// Kumiho objects, including access to the client for making API calls.
+/// Subclasses build on top of protobuf responses to provide an expressive,
+/// documentable surface for SDK users.
 ///
 /// All domain objects ([Project], [Space], [Item], [Revision], [Artifact],
-/// [Edge]) inherit from this class.
+/// [Edge], [Bundle]) inherit from this class.
 abstract class KumihoObject {
   /// Creates a new [KumihoObject] with a client reference.
   KumihoObject(this.client);
