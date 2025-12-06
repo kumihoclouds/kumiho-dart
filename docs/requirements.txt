@@ -1,3 +1,7 @@
-sphinx>=7.3
-alabaster>=0.7.13
+# Requirements for building documentation
+# Install with: pip install -r requirements.txt
+
+sphinx>=7.0.0
+sphinx-rtd-theme>=2.0.0
+myst-parser>=2.0.0
 PyYAML>=6.0

@@ -165,8 +165,8 @@ class Space extends KumihoObject {
   /// final children = await assets.getChildSpaces();
   /// ```
   Future<List<Space>> getChildSpaces({bool recursive = false}) async {
-    final response = await client.getChildSpaces(path);
-    final spaces = response.spaces.map((s) => Space(s, client)).toList();
+    final spaceResponses = await client.getChildSpaces(path);
+    final spaces = spaceResponses.map((s) => Space(s, client)).toList();
 
     if (recursive && spaces.isNotEmpty) {
       final allSpaces = <Space>[...spaces];

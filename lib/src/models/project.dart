@@ -140,8 +140,8 @@ class Project extends KumihoObject {
   /// }
   /// ```
   Future<List<Space>> getSpaces({bool recursive = false}) async {
-    final response = await client.getChildSpaces('/$name');
-    final spaces = response.spaces.map((s) => Space(s, client)).toList();
+    final spaceResponses = await client.getChildSpaces('/$name');
+    final spaces = spaceResponses.map((s) => Space(s, client)).toList();
 
     if (recursive && spaces.isNotEmpty) {
       final allSpaces = <Space>[...spaces];
