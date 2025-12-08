@@ -198,14 +198,48 @@ File getCredentialsFile() {
   return File('${getConfigDir().path}/${AuthDefaults.credentialsFilename}');
 }
 
+/// Checks if the credential file has secure permissions (Unix only).
+///
+/// Returns `true` if permissions are secure or on Windows.
+/// Logs a warning if permissions allow group/world access.
+bool _checkCredentialPermissions(File file) {
+  if (Platform.isWindows) {
+    return true; // Skip check on Windows
+  }
+  try {
+    final stat = file.statSync();
+    // On Unix, check if group or world has any permissions
+    // mode bits: rwxrwxrwx -> owner/group/world
+    // We want to ensure bits 0-5 (group and world) are all zero
+    final mode = stat.mode;
+    final groupWorldBits = mode & 0x3F; // Last 6 bits: group (3) + world (3)
+    if (groupWorldBits != 0) {
+      stderr.writeln(
+        'Warning: Credential file ${file.path} has insecure permissions '
+        '(mode: ${mode.toRadixString(8)}). Other users may be able to read '
+        'your credentials. Run: chmod 600 ${file.path}',
+      );
+      return false;
+    }
+    return true;
+  } catch (_) {
+    return true; // Ignore errors checking permissions
+  }
+}
+
 /// Reads cached credentials from the credentials file.
 ///
 /// Returns `null` if the file doesn't exist or is invalid.
+/// Warns if the file has insecure permissions on Unix systems.
 KumihoCredentials? loadCredentials() {
   final file = getCredentialsFile();
   if (!file.existsSync()) {
     return null;
   }
+  
+  // Security: Check file permissions before reading
+  _checkCredentialPermissions(file);
+  
   try {
     final content = file.readAsStringSync();
     final json = jsonDecode(content) as Map<String, dynamic>;
@@ -242,6 +276,56 @@ String? _normalize(String? value) {
   return trimmed.isEmpty ? null : trimmed;
 }
 
+/// Exception thrown when a token has invalid format.
+class InvalidTokenFormatException implements Exception {
+  /// Creates an invalid token format exception.
+  const InvalidTokenFormatException(this.message, this.source);
+  
+  /// The error message.
+  final String message;
+  
+  /// The source of the invalid token.
+  final String source;
+  
+  @override
+  String toString() => 'InvalidTokenFormatException: $message (source: $source)';
+}
+
+/// Validates that a token has valid JWT structure (3 base64 parts).
+/// 
+/// Returns the validated token, or null if token was null/empty.
+/// Throws [InvalidTokenFormatException] if the token is malformed.
+String? validateTokenFormat(String? token, {String source = 'token'}) {
+  if (token == null || token.trim().isEmpty) {
+    return null;
+  }
+  
+  final trimmed = token.trim();
+  final parts = trimmed.split('.');
+  
+  if (parts.length != 3) {
+    throw InvalidTokenFormatException(
+      'Expected JWT with 3 parts (header.payload.signature), '
+      'but got ${parts.length} part(s). '
+      'Did you accidentally use an API key instead of a JWT token? '
+      'Use "kumiho-cli login" to obtain a valid token.',
+      source,
+    );
+  }
+  
+  // Basic check that each part is non-empty
+  for (var i = 0; i < parts.length; i++) {
+    if (parts[i].isEmpty) {
+      throw InvalidTokenFormatException(
+        'JWT part ${i + 1} is empty. The token may be corrupted or incomplete.',
+        source,
+      );
+    }
+  }
+  
+  return trimmed;
+}
+
 /// Loads the bearer token for gRPC calls.
 ///
 /// Token loading priority:
@@ -250,11 +334,12 @@ String? _normalize(String? value) {
 /// 3. Control Plane token from credentials file (if `KUMIHO_USE_CONTROL_PLANE_TOKEN=true`)
 ///
 /// Returns `null` if no token is available.
+/// Throws [InvalidTokenFormatException] if a token is found but has invalid format.
 String? loadBearerToken() {
   // 1. Check environment variable first
   final envToken = _normalize(Platform.environment[AuthEnvVars.authToken]);
   if (envToken != null) {
-    return envToken;
+    return validateTokenFormat(envToken, source: 'KUMIHO_AUTH_TOKEN');
   }
 
   // 2. Load from credentials file
@@ -266,17 +351,23 @@ String? loadBearerToken() {
   // 3. Check preference for Control Plane token
   final preferCp = _envFlag(AuthEnvVars.useControlPlaneToken);
   if (preferCp && credentials.controlPlaneToken != null) {
-    return credentials.controlPlaneToken;
+    return validateTokenFormat(
+      credentials.controlPlaneToken,
+      source: 'control_plane_token',
+    );
   }
 
   // 4. Prefer Firebase token
   if (credentials.idToken.isNotEmpty) {
-    return credentials.idToken;
+    return validateTokenFormat(credentials.idToken, source: 'id_token');
   }
 
   // 5. Fallback to Control Plane token
   if (credentials.controlPlaneToken != null) {
-    return credentials.controlPlaneToken;
+    return validateTokenFormat(
+      credentials.controlPlaneToken,
+      source: 'control_plane_token',
+    );
   }
 
   return null;

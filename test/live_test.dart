@@ -88,7 +88,7 @@ void main() {
 
     // Default to localhost for testing, can be overridden
     final host = Platform.environment['KUMIHO_HOST'] ?? 'localhost';
-    final port = int.parse(Platform.environment['KUMIHO_PORT'] ?? '50051');
+    final port = int.parse(Platform.environment['KUMIHO_PORT'] ?? '8080');
     final secure = Platform.environment['KUMIHO_SECURE'] == 'true';
 
     client = KumihoClient(

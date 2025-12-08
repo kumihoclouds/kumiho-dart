@@ -62,8 +62,25 @@ abstract class KumihoClientBase {
     if (clientChannel != null) {
       channel = clientChannel;
     } else {
+      // Security: Warn if connecting to non-localhost without TLS
+      final isLocalhost = host!.toLowerCase() == 'localhost' ||
+          host == '127.0.0.1' ||
+          host == '::1';
+      final requireTls = _envFlag('KUMIHO_REQUIRE_TLS');
+      if (!isLocalhost && !secure) {
+        if (requireTls) {
+          throw ArgumentError(
+            'TLS is required but connecting to $host without TLS. '
+            'Set secure: true or use KUMIHO_SERVER_USE_TLS=true.',
+          );
+        }
+        stderr.writeln(
+          'Warning: Connecting to $host without TLS. Credentials may be '
+          'transmitted in plaintext. Set secure: true for production.',
+        );
+      }
       channel = ClientChannel(
-        host!,
+        host,
         port: port!,
         options: options ??
             ChannelOptions(
@@ -107,16 +124,30 @@ abstract class KumihoClientBase {
     _tokenSource = value != null ? 'manual' : null;
   }
 
-  /// Creates [CallOptions] with authentication metadata.
+  /// Creates [CallOptions] with authentication metadata and correlation ID.
   ///
-  /// Call this to get options with the Bearer token injected.
+  /// Call this to get options with the Bearer token and correlation ID injected.
+  /// A unique correlation ID is generated per call for end-to-end tracing.
   CallOptions get callOptions {
-    if (_token == null || _token!.isEmpty) {
-      return CallOptions();
+    final correlationId = _generateCorrelationId();
+    final metadata = <String, String>{
+      'x-correlation-id': correlationId,
+    };
+    
+    if (_token != null && _token!.isNotEmpty) {
+      metadata['authorization'] = 'Bearer $_token';
     }
-    return CallOptions(
-      metadata: {'authorization': 'Bearer $_token'},
-    );
+    
+    return CallOptions(metadata: metadata);
+  }
+  
+  /// Generates a unique correlation ID for request tracing.
+  static String _generateCorrelationId() {
+    // Use current timestamp + random suffix for uniqueness
+    final timestamp = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
+    final random = (DateTime.now().microsecond * 1000 + 
+                   DateTime.now().millisecond).toRadixString(16).padLeft(4, '0');
+    return 'kumiho-$timestamp$random';
   }
 
   /// Merges default call options with custom options.
