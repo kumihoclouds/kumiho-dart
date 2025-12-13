@@ -149,8 +149,8 @@ class Item extends KumihoObject {
   /// }
   /// ```
   Future<List<Revision>> getRevisions() async {
-    final response = await client.getRevisions(kref.uri);
-    return response.revisions.map((r) => Revision(r, client)).toList();
+    final revisions = await client.getRevisions(kref.uri);
+    return revisions.map<Revision>((r) => Revision(r, client)).toList();
   }
 
   /// Gets a revision by tag.

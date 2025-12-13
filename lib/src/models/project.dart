@@ -12,6 +12,7 @@ import 'base.dart';
 import 'space.dart';
 import 'item.dart';
 import 'bundle.dart';
+import 'paged_list.dart';
 
 /// A Kumiho project—the top-level container for assets.
 ///
@@ -97,6 +98,32 @@ class Project extends KumihoObject {
     return Item(response, client);
   }
 
+  /// Searches for items within this project.
+  ///
+  /// ```dart
+  /// final items = await project.getItems(kindFilter: 'model');
+  /// ```
+  Future<PagedList<Item>> getItems({
+    String? kindFilter,
+    String? nameFilter,
+    int? pageSize,
+    String? cursor,
+  }) async {
+    final items = await client.itemSearch(
+      name,
+      nameFilter ?? '',
+      kindFilter ?? '',
+      pageSize: pageSize,
+      cursor: cursor,
+    );
+    
+    return PagedList(
+      items.map<Item>((i) => Item(i, client)).toList(),
+      nextCursor: items.nextCursor,
+      totalCount: items.totalCount,
+    );
+  }
+
   /// Creates a new bundle within this project.
   ///
   /// Bundles are special items that aggregate other items.
@@ -153,20 +180,6 @@ class Project extends KumihoObject {
     }
 
     return spaces;
-  }
-
-  /// Gets all items in the root of this project.
-  ///
-  /// ```dart
-  /// final items = await project.getItems();
-  /// ```
-  Future<List<Item>> getItems({String? kindFilter, String? nameFilter}) async {
-    final response = await client.getItems(
-      '/$name',
-      kindFilter: kindFilter,
-      nameFilter: nameFilter,
-    );
-    return response.items.map((i) => Item(i, client)).toList();
   }
 
   /// Updates the project description.

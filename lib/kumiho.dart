@@ -116,6 +116,7 @@ export 'src/models/revision.dart';
 export 'src/models/artifact.dart';
 export 'src/models/edge.dart';
 export 'src/models/bundle.dart';
+export 'src/models/paged_list.dart';
 
 /// High-level Dart client for the Kumiho Cloud service.
 ///
@@ -175,12 +176,14 @@ class KumihoClient extends KumihoClientBase
   /// to create a new channel.
   ///
   /// [token] is the authentication token (Firebase ID token).
+  /// [tenantId] is the tenant ID for anonymous public access (passed as x-tenant-id header).
   /// [secure] enables TLS when `true` (required for production).
   /// [options] allows custom channel configuration.
   KumihoClient({
     String host = 'localhost',
     int port = 8080,
     String? token,
+    String? tenantId,
     ClientChannelBase? channel,
     ChannelOptions? options,
     bool secure = false,
@@ -189,6 +192,7 @@ class KumihoClient extends KumihoClientBase
           host: host,
           port: port,
           token: token,
+          tenantId: tenantId,
           options: options,
           secure: secure,
         );

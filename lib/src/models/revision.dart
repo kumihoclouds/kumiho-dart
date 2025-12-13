@@ -141,8 +141,8 @@ class Revision extends KumihoObject {
   /// }
   /// ```
   Future<List<Artifact>> getArtifacts() async {
-    final response = await client.getArtifacts(kref.uri);
-    return response.artifacts.map((a) => Artifact(a, client)).toList();
+    final artifacts = await client.getArtifacts(kref.uri);
+    return artifacts.map<Artifact>((a) => Artifact(a, client)).toList();
   }
 
   /// Sets the default artifact for this revision.

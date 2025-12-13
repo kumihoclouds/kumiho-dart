@@ -33,6 +33,7 @@ abstract class KumihoClientBase {
   /// to create a new channel.
   ///
   /// Use [token] to provide a Bearer token for authentication.
+  /// Use [tenantId] to specify the tenant for anonymous public access.
   /// Set [secure] to `true` to use TLS (required for production).
   /// Set [autoLoadToken] to `true` (default) to load token from env/file.
   KumihoClientBase({
@@ -40,10 +41,12 @@ abstract class KumihoClientBase {
     String? host,
     int? port,
     String? token,
+    String? tenantId,
     ChannelOptions? options,
     bool secure = false,
     bool autoLoadToken = true,
-  })  : assert(
+  })  : _tenantId = tenantId,
+        assert(
           clientChannel != null || (host != null && port != null),
           'Provide either an existing channel or host/port pair.',
         ),
@@ -107,11 +110,17 @@ abstract class KumihoClientBase {
   /// Source of the current token.
   String? _tokenSource;
 
+  /// Tenant ID for anonymous public access.
+  final String? _tenantId;
+
   /// Cached credentials for refresh.
   KumihoCredentials? _credentials;
 
   /// Get the current authentication token.
   String? get token => _token;
+
+  /// Get the tenant ID for anonymous access.
+  String? get tenantId => _tenantId;
 
   /// Get the source of the current token (for debugging).
   String? get tokenSource => _tokenSource;
@@ -136,6 +145,11 @@ abstract class KumihoClientBase {
     
     if (_token != null && _token!.isNotEmpty) {
       metadata['authorization'] = 'Bearer $_token';
+    }
+    
+    // Add tenant ID for anonymous public access
+    if (_tenantId != null && _tenantId!.isNotEmpty) {
+      metadata['x-tenant-id'] = _tenantId!;
     }
     
     return CallOptions(metadata: metadata);

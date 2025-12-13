@@ -522,6 +522,19 @@ const ItemSearchRequest$json = {
     {'1': 'context_filter', '3': 1, '4': 1, '5': 9, '10': 'contextFilter'},
     {'1': 'item_name_filter', '3': 2, '4': 1, '5': 9, '10': 'itemNameFilter'},
     {'1': 'kind_filter', '3': 3, '4': 1, '5': 9, '10': 'kindFilter'},
+    {
+      '1': 'pagination',
+      '3': 4,
+      '4': 1,
+      '5': 11,
+      '6': '.kumiho.PaginationRequest',
+      '9': 0,
+      '10': 'pagination',
+      '17': true
+    },
+  ],
+  '8': [
+    {'1': '_pagination'},
   ],
 };
 
@@ -529,7 +542,8 @@ const ItemSearchRequest$json = {
 final $typed_data.Uint8List itemSearchRequestDescriptor = $convert.base64Decode(
     'ChFJdGVtU2VhcmNoUmVxdWVzdBIlCg5jb250ZXh0X2ZpbHRlchgBIAEoCVINY29udGV4dEZpbH'
     'RlchIoChBpdGVtX25hbWVfZmlsdGVyGAIgASgJUg5pdGVtTmFtZUZpbHRlchIfCgtraW5kX2Zp'
-    'bHRlchgDIAEoCVIKa2luZEZpbHRlcg==');
+    'bHRlchgDIAEoCVIKa2luZEZpbHRlchI+CgpwYWdpbmF0aW9uGAQgASgLMhkua3VtaWhvLlBhZ2'
+    'luYXRpb25SZXF1ZXN0SABSCnBhZ2luYXRpb26IAQFCDQoLX3BhZ2luYXRpb24=');
 
 @$core.Deprecated('Use createRevisionRequestDescriptor instead')
 const CreateRevisionRequest$json = {

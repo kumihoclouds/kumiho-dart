@@ -11,6 +11,7 @@ import '../generated/kumiho.pb.dart' as pb;
 import 'base.dart';
 import 'item.dart';
 import 'bundle.dart';
+import 'paged_list.dart';
 
 /// A hierarchical container for organizing items in Kumiho.
 ///
@@ -146,13 +147,25 @@ class Space extends KumihoObject {
   /// final items = await models.getItems();
   /// final textures = await assets.getItems(kindFilter: 'texture');
   /// ```
-  Future<List<Item>> getItems({String? kindFilter, String? nameFilter}) async {
-    final response = await client.getItems(
+  Future<PagedList<Item>> getItems({
+    String? kindFilter,
+    String? nameFilter,
+    int? pageSize,
+    String? cursor,
+  }) async {
+    final items = await client.getItems(
       path,
       kindFilter: kindFilter,
       nameFilter: nameFilter,
+      pageSize: pageSize,
+      cursor: cursor,
     );
-    return response.items.map((i) => Item(i, client)).toList();
+    
+    return PagedList(
+      items.map<Item>((i) => Item(i, client)).toList(),
+      nextCursor: items.nextCursor,
+      totalCount: items.totalCount,
+    );
   }
 
   /// Gets all child spaces of this space.

@@ -254,4 +254,44 @@ void main() {
       expect(response.tenantId, equals('my-tenant'));
     });
   });
+
+  group('Pagination', () {
+    test('mockGetItemsResponse supports pagination fields', () {
+      final items = [
+        mockItemResponse(
+            krefUri: 'kref://p1/s1/i1',
+            name: 'i1',
+            itemName: 'i1',
+            kind: 'model'),
+        mockItemResponse(
+            krefUri: 'kref://p1/s1/i2',
+            name: 'i2',
+            itemName: 'i2',
+            kind: 'model'),
+      ];
+      final response = mockGetItemsResponse(
+        items: items,
+        nextCursor: 'cursor_123',
+        totalCount: 10,
+      );
+
+      expect(response.items.length, equals(2));
+      expect(response.pagination.nextCursor, equals('cursor_123'));
+      expect(response.pagination.totalCount, equals(10));
+    });
+
+    test('PagedList behaves like a list and has metadata', () {
+      final items = ['a', 'b', 'c'];
+      final pagedList = PagedList(items, nextCursor: 'next_page', totalCount: 100);
+
+      expect(pagedList.length, equals(3));
+      expect(pagedList[0], equals('a'));
+      expect(pagedList.nextCursor, equals('next_page'));
+      expect(pagedList.totalCount, equals(100));
+      
+      // Verify list methods work
+      expect(pagedList.contains('b'), isTrue);
+      expect(pagedList.map((e) => e.toUpperCase()).toList(), equals(['A', 'B', 'C']));
+    });
+  });
 }

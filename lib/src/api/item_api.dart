@@ -3,6 +3,7 @@
 
 import '../base_client.dart';
 import '../generated/kumiho.pbgrpc.dart';
+import '../models/paged_list.dart';
 
 /// Item API mixin for managing versioned assets.
 ///
@@ -100,17 +101,33 @@ mixin ItemApi on KumihoClientBase {
   /// [parentPath] is the space path to list items from.
   /// [nameFilter] filters items by name pattern (supports wildcards).
   /// [kindFilter] filters items by kind.
-  Future<List<ItemResponse>> getItems(
+  /// [pageSize] optional page size for pagination.
+  /// [cursor] optional cursor for pagination.
+  Future<PagedList<ItemResponse>> getItems(
     String parentPath, {
     String? nameFilter,
     String? kindFilter,
+    int? pageSize,
+    String? cursor,
   }) async {
     final request = GetItemsRequest()
       ..parentPath = parentPath
       ..itemNameFilter = nameFilter ?? ''
       ..kindFilter = kindFilter ?? '';
+      
+    if (pageSize != null || cursor != null) {
+      request.pagination = PaginationRequest()
+        ..pageSize = pageSize ?? 100
+        ..cursor = cursor ?? '';
+    }
+
     final response = await stub.getItems(request, options: callOptions);
-    return response.items;
+    
+    return PagedList(
+      response.items,
+      nextCursor: response.hasPagination() ? response.pagination.nextCursor : null,
+      totalCount: response.hasPagination() ? response.pagination.totalCount : null,
+    );
   }
 
   /// Searches for items across the project.
@@ -118,17 +135,33 @@ mixin ItemApi on KumihoClientBase {
   /// [contextFilter] filters by project or space path (supports wildcards).
   /// [nameFilter] filters by item name pattern.
   /// [kindFilter] filters by item kind.
-  Future<List<ItemResponse>> itemSearch(
+  /// [pageSize] optional page size for pagination.
+  /// [cursor] optional cursor for pagination.
+  Future<PagedList<ItemResponse>> itemSearch(
     String contextFilter,
     String nameFilter,
-    String kindFilter,
-  ) async {
+    String kindFilter, {
+    int? pageSize,
+    String? cursor,
+  }) async {
     final request = ItemSearchRequest()
       ..contextFilter = contextFilter
       ..itemNameFilter = nameFilter
       ..kindFilter = kindFilter;
+
+    if (pageSize != null || cursor != null) {
+      request.pagination = PaginationRequest()
+        ..pageSize = pageSize ?? 100
+        ..cursor = cursor ?? '';
+    }
+
     final response = await stub.itemSearch(request, options: callOptions);
-    return response.items;
+    
+    return PagedList(
+      response.items,
+      nextCursor: response.hasPagination() ? response.pagination.nextCursor : null,
+      totalCount: response.hasPagination() ? response.pagination.totalCount : null,
+    );
   }
 
   /// Deletes an item.

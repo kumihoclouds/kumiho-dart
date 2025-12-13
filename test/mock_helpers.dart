@@ -145,8 +145,17 @@ ItemResponse mockItemResponse({
 /// Creates a mock GetItemsResponse.
 GetItemsResponse mockGetItemsResponse({
   List<ItemResponse>? items,
+  String nextCursor = '',
+  int totalCount = 0,
 }) {
-  return GetItemsResponse()..items.addAll(items ?? []);
+  final pagination = PaginationResponse()
+    ..nextCursor = nextCursor
+    ..totalCount = totalCount
+    ..hasMore = nextCursor.isNotEmpty;
+
+  return GetItemsResponse()
+    ..items.addAll(items ?? [])
+    ..pagination = pagination;
 }
 
 /// Creates a mock ArtifactResponse.

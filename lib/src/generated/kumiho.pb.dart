@@ -1760,11 +1760,13 @@ class ItemSearchRequest extends $pb.GeneratedMessage {
     $core.String? contextFilter,
     $core.String? itemNameFilter,
     $core.String? kindFilter,
+    PaginationRequest? pagination,
   }) {
     final result = create();
     if (contextFilter != null) result.contextFilter = contextFilter;
     if (itemNameFilter != null) result.itemNameFilter = itemNameFilter;
     if (kindFilter != null) result.kindFilter = kindFilter;
+    if (pagination != null) result.pagination = pagination;
     return result;
   }
 
@@ -1784,6 +1786,8 @@ class ItemSearchRequest extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'contextFilter')
     ..aOS(2, _omitFieldNames ? '' : 'itemNameFilter')
     ..aOS(3, _omitFieldNames ? '' : 'kindFilter')
+    ..aOM<PaginationRequest>(4, _omitFieldNames ? '' : 'pagination',
+        subBuilder: PaginationRequest.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1831,6 +1835,18 @@ class ItemSearchRequest extends $pb.GeneratedMessage {
   $core.bool hasKindFilter() => $_has(2);
   @$pb.TagNumber(3)
   void clearKindFilter() => $_clearField(3);
+
+  /// Optional pagination parameters
+  @$pb.TagNumber(4)
+  PaginationRequest get pagination => $_getN(3);
+  @$pb.TagNumber(4)
+  set pagination(PaginationRequest value) => $_setField(4, value);
+  @$pb.TagNumber(4)
+  $core.bool hasPagination() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearPagination() => $_clearField(4);
+  @$pb.TagNumber(4)
+  PaginationRequest ensurePagination() => $_ensure(3);
 }
 
 class CreateRevisionRequest extends $pb.GeneratedMessage {
