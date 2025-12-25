@@ -108,6 +108,7 @@ class Project extends KumihoObject {
     String? nameFilter,
     int? pageSize,
     String? cursor,
+    bool includeDeprecated = false,
   }) async {
     final items = await client.itemSearch(
       name,
@@ -115,6 +116,7 @@ class Project extends KumihoObject {
       kindFilter ?? '',
       pageSize: pageSize,
       cursor: cursor,
+      includeDeprecated: includeDeprecated,
     );
     
     return PagedList(

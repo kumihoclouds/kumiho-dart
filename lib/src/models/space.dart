@@ -152,6 +152,7 @@ class Space extends KumihoObject {
     String? nameFilter,
     int? pageSize,
     String? cursor,
+    bool includeDeprecated = false,
   }) async {
     final items = await client.getItems(
       path,
@@ -159,6 +160,7 @@ class Space extends KumihoObject {
       nameFilter: nameFilter,
       pageSize: pageSize,
       cursor: cursor,
+      includeDeprecated: includeDeprecated,
     );
     
     return PagedList(

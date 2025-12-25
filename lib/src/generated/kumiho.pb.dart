@@ -10,6 +10,7 @@
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
+import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -1602,12 +1603,14 @@ class GetItemsRequest extends $pb.GeneratedMessage {
     $core.String? itemNameFilter,
     $core.String? kindFilter,
     PaginationRequest? pagination,
+    $core.bool? includeDeprecated,
   }) {
     final result = create();
     if (parentPath != null) result.parentPath = parentPath;
     if (itemNameFilter != null) result.itemNameFilter = itemNameFilter;
     if (kindFilter != null) result.kindFilter = kindFilter;
     if (pagination != null) result.pagination = pagination;
+    if (includeDeprecated != null) result.includeDeprecated = includeDeprecated;
     return result;
   }
 
@@ -1629,6 +1632,7 @@ class GetItemsRequest extends $pb.GeneratedMessage {
     ..aOS(3, _omitFieldNames ? '' : 'kindFilter')
     ..aOM<PaginationRequest>(4, _omitFieldNames ? '' : 'pagination',
         subBuilder: PaginationRequest.create)
+    ..aOB(5, _omitFieldNames ? '' : 'includeDeprecated')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1688,6 +1692,15 @@ class GetItemsRequest extends $pb.GeneratedMessage {
   void clearPagination() => $_clearField(4);
   @$pb.TagNumber(4)
   PaginationRequest ensurePagination() => $_ensure(3);
+
+  @$pb.TagNumber(5)
+  $core.bool get includeDeprecated => $_getBF(4);
+  @$pb.TagNumber(5)
+  set includeDeprecated($core.bool value) => $_setBool(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasIncludeDeprecated() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearIncludeDeprecated() => $_clearField(5);
 }
 
 class GetItemsResponse extends $pb.GeneratedMessage {
@@ -1761,12 +1774,14 @@ class ItemSearchRequest extends $pb.GeneratedMessage {
     $core.String? itemNameFilter,
     $core.String? kindFilter,
     PaginationRequest? pagination,
+    $core.bool? includeDeprecated,
   }) {
     final result = create();
     if (contextFilter != null) result.contextFilter = contextFilter;
     if (itemNameFilter != null) result.itemNameFilter = itemNameFilter;
     if (kindFilter != null) result.kindFilter = kindFilter;
     if (pagination != null) result.pagination = pagination;
+    if (includeDeprecated != null) result.includeDeprecated = includeDeprecated;
     return result;
   }
 
@@ -1788,6 +1803,7 @@ class ItemSearchRequest extends $pb.GeneratedMessage {
     ..aOS(3, _omitFieldNames ? '' : 'kindFilter')
     ..aOM<PaginationRequest>(4, _omitFieldNames ? '' : 'pagination',
         subBuilder: PaginationRequest.create)
+    ..aOB(5, _omitFieldNames ? '' : 'includeDeprecated')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1847,6 +1863,15 @@ class ItemSearchRequest extends $pb.GeneratedMessage {
   void clearPagination() => $_clearField(4);
   @$pb.TagNumber(4)
   PaginationRequest ensurePagination() => $_ensure(3);
+
+  @$pb.TagNumber(5)
+  $core.bool get includeDeprecated => $_getBF(4);
+  @$pb.TagNumber(5)
+  set includeDeprecated($core.bool value) => $_setBool(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasIncludeDeprecated() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearIncludeDeprecated() => $_clearField(5);
 }
 
 class CreateRevisionRequest extends $pb.GeneratedMessage {
@@ -7023,6 +7048,248 @@ class TenantUsageResponse extends $pb.GeneratedMessage {
   $core.bool hasTenantId() => $_has(2);
   @$pb.TagNumber(3)
   void clearTenantId() => $_clearField(3);
+}
+
+/// The Kumiho service definition.
+class KumihoServiceApi {
+  final $pb.RpcClient _client;
+
+  KumihoServiceApi(this._client);
+
+  /// Project methods
+  $async.Future<ProjectResponse> createProject(
+          $pb.ClientContext? ctx, CreateProjectRequest request) =>
+      _client.invoke<ProjectResponse>(
+          ctx, 'KumihoService', 'CreateProject', request, ProjectResponse());
+  $async.Future<GetProjectsResponse> getProjects(
+          $pb.ClientContext? ctx, GetProjectsRequest request) =>
+      _client.invoke<GetProjectsResponse>(
+          ctx, 'KumihoService', 'GetProjects', request, GetProjectsResponse());
+  $async.Future<ProjectResponse> updateProject(
+          $pb.ClientContext? ctx, UpdateProjectRequest request) =>
+      _client.invoke<ProjectResponse>(
+          ctx, 'KumihoService', 'UpdateProject', request, ProjectResponse());
+  $async.Future<StatusResponse> deleteProject(
+          $pb.ClientContext? ctx, DeleteProjectRequest request) =>
+      _client.invoke<StatusResponse>(
+          ctx, 'KumihoService', 'DeleteProject', request, StatusResponse());
+
+  /// Space methods
+  $async.Future<SpaceResponse> createSpace(
+          $pb.ClientContext? ctx, CreateSpaceRequest request) =>
+      _client.invoke<SpaceResponse>(
+          ctx, 'KumihoService', 'CreateSpace', request, SpaceResponse());
+  $async.Future<SpaceResponse> getSpace(
+          $pb.ClientContext? ctx, GetSpaceRequest request) =>
+      _client.invoke<SpaceResponse>(
+          ctx, 'KumihoService', 'GetSpace', request, SpaceResponse());
+  $async.Future<GetChildSpacesResponse> getChildSpaces(
+          $pb.ClientContext? ctx, GetChildSpacesRequest request) =>
+      _client.invoke<GetChildSpacesResponse>(ctx, 'KumihoService',
+          'GetChildSpaces', request, GetChildSpacesResponse());
+  $async.Future<StatusResponse> deleteSpace(
+          $pb.ClientContext? ctx, DeleteSpaceRequest request) =>
+      _client.invoke<StatusResponse>(
+          ctx, 'KumihoService', 'DeleteSpace', request, StatusResponse());
+  $async.Future<SpaceResponse> updateSpaceMetadata(
+          $pb.ClientContext? ctx, UpdateMetadataRequest request) =>
+      _client.invoke<SpaceResponse>(ctx, 'KumihoService', 'UpdateSpaceMetadata',
+          request, SpaceResponse());
+
+  /// Item methods
+  $async.Future<ItemResponse> createItem(
+          $pb.ClientContext? ctx, CreateItemRequest request) =>
+      _client.invoke<ItemResponse>(
+          ctx, 'KumihoService', 'CreateItem', request, ItemResponse());
+  $async.Future<ItemResponse> getItem(
+          $pb.ClientContext? ctx, GetItemRequest request) =>
+      _client.invoke<ItemResponse>(
+          ctx, 'KumihoService', 'GetItem', request, ItemResponse());
+  $async.Future<GetItemsResponse> getItems(
+          $pb.ClientContext? ctx, GetItemsRequest request) =>
+      _client.invoke<GetItemsResponse>(
+          ctx, 'KumihoService', 'GetItems', request, GetItemsResponse());
+  $async.Future<GetItemsResponse> itemSearch(
+          $pb.ClientContext? ctx, ItemSearchRequest request) =>
+      _client.invoke<GetItemsResponse>(
+          ctx, 'KumihoService', 'ItemSearch', request, GetItemsResponse());
+  $async.Future<StatusResponse> deleteItem(
+          $pb.ClientContext? ctx, DeleteItemRequest request) =>
+      _client.invoke<StatusResponse>(
+          ctx, 'KumihoService', 'DeleteItem', request, StatusResponse());
+  $async.Future<ItemResponse> updateItemMetadata(
+          $pb.ClientContext? ctx, UpdateMetadataRequest request) =>
+      _client.invoke<ItemResponse>(
+          ctx, 'KumihoService', 'UpdateItemMetadata', request, ItemResponse());
+
+  /// Revision methods
+  $async.Future<RevisionResponse> resolveKref(
+          $pb.ClientContext? ctx, ResolveKrefRequest request) =>
+      _client.invoke<RevisionResponse>(
+          ctx, 'KumihoService', 'ResolveKref', request, RevisionResponse());
+  $async.Future<ResolveLocationResponse> resolveLocation(
+          $pb.ClientContext? ctx, ResolveLocationRequest request) =>
+      _client.invoke<ResolveLocationResponse>(ctx, 'KumihoService',
+          'ResolveLocation', request, ResolveLocationResponse());
+  $async.Future<RevisionResponse> createRevision(
+          $pb.ClientContext? ctx, CreateRevisionRequest request) =>
+      _client.invoke<RevisionResponse>(
+          ctx, 'KumihoService', 'CreateRevision', request, RevisionResponse());
+  $async.Future<RevisionResponse> getRevision(
+          $pb.ClientContext? ctx, KrefRequest request) =>
+      _client.invoke<RevisionResponse>(
+          ctx, 'KumihoService', 'GetRevision', request, RevisionResponse());
+  $async.Future<GetRevisionsResponse> getRevisions(
+          $pb.ClientContext? ctx, GetRevisionsRequest request) =>
+      _client.invoke<GetRevisionsResponse>(ctx, 'KumihoService', 'GetRevisions',
+          request, GetRevisionsResponse());
+  $async.Future<StatusResponse> deleteRevision(
+          $pb.ClientContext? ctx, DeleteRevisionRequest request) =>
+      _client.invoke<StatusResponse>(
+          ctx, 'KumihoService', 'DeleteRevision', request, StatusResponse());
+  $async.Future<PeekNextRevisionResponse> peekNextRevision(
+          $pb.ClientContext? ctx, PeekNextRevisionRequest request) =>
+      _client.invoke<PeekNextRevisionResponse>(ctx, 'KumihoService',
+          'PeekNextRevision', request, PeekNextRevisionResponse());
+  $async.Future<RevisionResponse> updateRevisionMetadata(
+          $pb.ClientContext? ctx, UpdateMetadataRequest request) =>
+      _client.invoke<RevisionResponse>(ctx, 'KumihoService',
+          'UpdateRevisionMetadata', request, RevisionResponse());
+  $async.Future<StatusResponse> tagRevision(
+          $pb.ClientContext? ctx, TagRevisionRequest request) =>
+      _client.invoke<StatusResponse>(
+          ctx, 'KumihoService', 'TagRevision', request, StatusResponse());
+  $async.Future<StatusResponse> unTagRevision(
+          $pb.ClientContext? ctx, UnTagRevisionRequest request) =>
+      _client.invoke<StatusResponse>(
+          ctx, 'KumihoService', 'UnTagRevision', request, StatusResponse());
+  $async.Future<HasTagResponse> hasTag(
+          $pb.ClientContext? ctx, HasTagRequest request) =>
+      _client.invoke<HasTagResponse>(
+          ctx, 'KumihoService', 'HasTag', request, HasTagResponse());
+  $async.Future<WasTaggedResponse> wasTagged(
+          $pb.ClientContext? ctx, WasTaggedRequest request) =>
+      _client.invoke<WasTaggedResponse>(
+          ctx, 'KumihoService', 'WasTagged', request, WasTaggedResponse());
+  $async.Future<StatusResponse> setDefaultArtifact(
+          $pb.ClientContext? ctx, SetDefaultArtifactRequest request) =>
+      _client.invoke<StatusResponse>(ctx, 'KumihoService', 'SetDefaultArtifact',
+          request, StatusResponse());
+
+  /// Artifact methods
+  $async.Future<ArtifactResponse> createArtifact(
+          $pb.ClientContext? ctx, CreateArtifactRequest request) =>
+      _client.invoke<ArtifactResponse>(
+          ctx, 'KumihoService', 'CreateArtifact', request, ArtifactResponse());
+  $async.Future<ArtifactResponse> getArtifact(
+          $pb.ClientContext? ctx, GetArtifactRequest request) =>
+      _client.invoke<ArtifactResponse>(
+          ctx, 'KumihoService', 'GetArtifact', request, ArtifactResponse());
+  $async.Future<GetArtifactsResponse> getArtifacts(
+          $pb.ClientContext? ctx, GetArtifactsRequest request) =>
+      _client.invoke<GetArtifactsResponse>(ctx, 'KumihoService', 'GetArtifacts',
+          request, GetArtifactsResponse());
+  $async.Future<GetArtifactsByLocationResponse> getArtifactsByLocation(
+          $pb.ClientContext? ctx, GetArtifactsByLocationRequest request) =>
+      _client.invoke<GetArtifactsByLocationResponse>(ctx, 'KumihoService',
+          'GetArtifactsByLocation', request, GetArtifactsByLocationResponse());
+  $async.Future<StatusResponse> deleteArtifact(
+          $pb.ClientContext? ctx, DeleteArtifactRequest request) =>
+      _client.invoke<StatusResponse>(
+          ctx, 'KumihoService', 'DeleteArtifact', request, StatusResponse());
+  $async.Future<ArtifactResponse> updateArtifactMetadata(
+          $pb.ClientContext? ctx, UpdateMetadataRequest request) =>
+      _client.invoke<ArtifactResponse>(ctx, 'KumihoService',
+          'UpdateArtifactMetadata', request, ArtifactResponse());
+
+  /// Attribute methods (granular metadata operations)
+  /// These work on any entity type (Revision, Item, Artifact, Space) identified by kref
+  $async.Future<StatusResponse> setAttribute(
+          $pb.ClientContext? ctx, SetAttributeRequest request) =>
+      _client.invoke<StatusResponse>(
+          ctx, 'KumihoService', 'SetAttribute', request, StatusResponse());
+  $async.Future<GetAttributeResponse> getAttribute(
+          $pb.ClientContext? ctx, GetAttributeRequest request) =>
+      _client.invoke<GetAttributeResponse>(ctx, 'KumihoService', 'GetAttribute',
+          request, GetAttributeResponse());
+  $async.Future<StatusResponse> deleteAttribute(
+          $pb.ClientContext? ctx, DeleteAttributeRequest request) =>
+      _client.invoke<StatusResponse>(
+          ctx, 'KumihoService', 'DeleteAttribute', request, StatusResponse());
+
+  /// Edge methods
+  $async.Future<StatusResponse> createEdge(
+          $pb.ClientContext? ctx, CreateEdgeRequest request) =>
+      _client.invoke<StatusResponse>(
+          ctx, 'KumihoService', 'CreateEdge', request, StatusResponse());
+  $async.Future<GetEdgesResponse> getEdges(
+          $pb.ClientContext? ctx, GetEdgesRequest request) =>
+      _client.invoke<GetEdgesResponse>(
+          ctx, 'KumihoService', 'GetEdges', request, GetEdgesResponse());
+  $async.Future<StatusResponse> deleteEdge(
+          $pb.ClientContext? ctx, DeleteEdgeRequest request) =>
+      _client.invoke<StatusResponse>(
+          ctx, 'KumihoService', 'DeleteEdge', request, StatusResponse());
+
+  /// Graph Traversal methods
+  $async.Future<TraverseEdgesResponse> traverseEdges(
+          $pb.ClientContext? ctx, TraverseEdgesRequest request) =>
+      _client.invoke<TraverseEdgesResponse>(ctx, 'KumihoService',
+          'TraverseEdges', request, TraverseEdgesResponse());
+  $async.Future<ShortestPathResponse> findShortestPath(
+          $pb.ClientContext? ctx, ShortestPathRequest request) =>
+      _client.invoke<ShortestPathResponse>(ctx, 'KumihoService',
+          'FindShortestPath', request, ShortestPathResponse());
+  $async.Future<ImpactAnalysisResponse> analyzeImpact(
+          $pb.ClientContext? ctx, ImpactAnalysisRequest request) =>
+      _client.invoke<ImpactAnalysisResponse>(ctx, 'KumihoService',
+          'AnalyzeImpact', request, ImpactAnalysisResponse());
+
+  /// Bundle methods
+  $async.Future<ItemResponse> createBundle(
+          $pb.ClientContext? ctx, CreateBundleRequest request) =>
+      _client.invoke<ItemResponse>(
+          ctx, 'KumihoService', 'CreateBundle', request, ItemResponse());
+  $async.Future<AddBundleMemberResponse> addBundleMember(
+          $pb.ClientContext? ctx, AddBundleMemberRequest request) =>
+      _client.invoke<AddBundleMemberResponse>(ctx, 'KumihoService',
+          'AddBundleMember', request, AddBundleMemberResponse());
+  $async.Future<RemoveBundleMemberResponse> removeBundleMember(
+          $pb.ClientContext? ctx, RemoveBundleMemberRequest request) =>
+      _client.invoke<RemoveBundleMemberResponse>(ctx, 'KumihoService',
+          'RemoveBundleMember', request, RemoveBundleMemberResponse());
+  $async.Future<GetBundleMembersResponse> getBundleMembers(
+          $pb.ClientContext? ctx, GetBundleMembersRequest request) =>
+      _client.invoke<GetBundleMembersResponse>(ctx, 'KumihoService',
+          'GetBundleMembers', request, GetBundleMembersResponse());
+  $async.Future<GetBundleHistoryResponse> getBundleHistory(
+          $pb.ClientContext? ctx, GetBundleHistoryRequest request) =>
+      _client.invoke<GetBundleHistoryResponse>(ctx, 'KumihoService',
+          'GetBundleHistory', request, GetBundleHistoryResponse());
+
+  /// Tenant methods
+  $async.Future<TenantUsageResponse> getTenantUsage(
+          $pb.ClientContext? ctx, GetTenantUsageRequest request) =>
+      _client.invoke<TenantUsageResponse>(ctx, 'KumihoService',
+          'GetTenantUsage', request, TenantUsageResponse());
+
+  /// Event Streaming
+  $async.Future<Event> eventStream(
+          $pb.ClientContext? ctx, EventStreamRequest request) =>
+      _client.invoke<Event>(
+          ctx, 'KumihoService', 'EventStream', request, Event());
+
+  /// Get event streaming capabilities for the authenticated tenant's tier
+  $async.Future<EventCapabilities> getEventCapabilities(
+          $pb.ClientContext? ctx, GetEventCapabilitiesRequest request) =>
+      _client.invoke<EventCapabilities>(ctx, 'KumihoService',
+          'GetEventCapabilities', request, EventCapabilities());
+
+  /// Deprecation methods
+  $async.Future<StatusResponse> setDeprecated(
+          $pb.ClientContext? ctx, SetDeprecatedRequest request) =>
+      _client.invoke<StatusResponse>(
+          ctx, 'KumihoService', 'SetDeprecated', request, StatusResponse());
 }
 
 const $core.bool _omitFieldNames =

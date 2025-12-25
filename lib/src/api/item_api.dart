@@ -103,17 +103,20 @@ mixin ItemApi on KumihoClientBase {
   /// [kindFilter] filters items by kind.
   /// [pageSize] optional page size for pagination.
   /// [cursor] optional cursor for pagination.
+  /// [includeDeprecated] whether to include deprecated items.
   Future<PagedList<ItemResponse>> getItems(
     String parentPath, {
     String? nameFilter,
     String? kindFilter,
     int? pageSize,
     String? cursor,
+    bool includeDeprecated = false,
   }) async {
     final request = GetItemsRequest()
       ..parentPath = parentPath
       ..itemNameFilter = nameFilter ?? ''
-      ..kindFilter = kindFilter ?? '';
+      ..kindFilter = kindFilter ?? ''
+      ..includeDeprecated = includeDeprecated;
       
     if (pageSize != null || cursor != null) {
       request.pagination = PaginationRequest()
@@ -137,17 +140,20 @@ mixin ItemApi on KumihoClientBase {
   /// [kindFilter] filters by item kind.
   /// [pageSize] optional page size for pagination.
   /// [cursor] optional cursor for pagination.
+  /// [includeDeprecated] whether to include deprecated items.
   Future<PagedList<ItemResponse>> itemSearch(
     String contextFilter,
     String nameFilter,
     String kindFilter, {
     int? pageSize,
     String? cursor,
+    bool includeDeprecated = false,
   }) async {
     final request = ItemSearchRequest()
       ..contextFilter = contextFilter
       ..itemNameFilter = nameFilter
-      ..kindFilter = kindFilter;
+      ..kindFilter = kindFilter
+      ..includeDeprecated = includeDeprecated;
 
     if (pageSize != null || cursor != null) {
       request.pagination = PaginationRequest()
