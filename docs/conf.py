@@ -77,6 +77,10 @@ html_sidebars = {
     ]
 }
 
+# Extra static content copied verbatim into the HTML output.
+# CI places generated dartdoc output under docs/_extra/dartdoc.
+html_extra_path = ["_extra"]
+
 # HTML title
 html_title = f"{project} v{release}"
 

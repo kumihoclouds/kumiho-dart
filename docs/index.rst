@@ -117,6 +117,12 @@ Contents
    usage_guide
    configuration
 
+.. toctree::
+  :maxdepth: 1
+  :caption: API Reference
+
+  api
+
 Indices and tables
 ==================
 

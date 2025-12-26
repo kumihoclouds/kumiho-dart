@@ -5,6 +5,9 @@ on:
     branches:
       - main
     paths:
+      - 'bin/**'
+      - 'lib/**'
+      - 'proto/**'
       - 'docs/**'
       - 'pubspec.yaml'
       - '.github/workflows/docs-publish.yml'
@@ -33,6 +36,21 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: "3.5.0"
+
+      - name: Install Dart dependencies
+        run: |
+          dart pub get
+
+      - name: Generate Dart API docs (dartdoc)
+        run: |
+          rm -rf docs/_extra/dartdoc
+          mkdir -p docs/_extra/dartdoc
+          dart doc --output docs/_extra/dartdoc
 
       - name: Set up Python
         uses: actions/setup-python@v5
