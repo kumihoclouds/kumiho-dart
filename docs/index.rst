@@ -9,7 +9,7 @@ Kumiho Dart SDK
    :target: https://pub.dev/packages/kumiho
    :alt: Pub version
 
-.. image:: https://img.shields.io/badge/dart-%3E%3D3.6.0-blue.svg
+.. image:: https://img.shields.io/badge/dart-%3E%3D3.7.0-blue.svg
    :target: https://dart.dev/
    :alt: Dart versions
 
