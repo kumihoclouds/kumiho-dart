@@ -176,7 +176,10 @@ mixin RevisionApi on KumihoClientBase {
   /// Tags a revision.
   ///
   /// Tags are used to mark revisions for easy retrieval (e.g., 'approved',
-  /// 'published', 'latest'). Some tags like 'published' have special semantics.
+  /// 'published'). Some tags like 'published' have special semantics.
+  ///
+  /// Note: 'latest' is a reserved system tag managed by the server and cannot
+  /// be set or removed manually.
   Future<StatusResponse> tagRevision(String kref, String tag) async {
     final request = TagRevisionRequest()
       ..kref = Kref(uri: kref)

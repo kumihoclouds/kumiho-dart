@@ -33,7 +33,8 @@
 /// | `KUMIHO_ENABLE_AUTO_REFRESH` | Enable token auto-refresh (true/false) |
 /// | `KUMIHO_AUTH_TOKEN_GRACE_SECONDS` | Grace period before expiry (default: 300) |
 /// | `KUMIHO_FIREBASE_API_KEY` | Custom Firebase API key |
-/// | `KUMIHO_CONTROL_PLANE_API_URL` | Custom CP API URL |
+/// | `KUMIHO_CONTROL_PLANE_URL` | Custom Control Plane base URL (preferred) |
+/// | `KUMIHO_CONTROL_PLANE_API_URL` | Custom CP base URL (legacy) |
 ///
 /// ## Usage
 ///

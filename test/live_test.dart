@@ -19,6 +19,12 @@ import 'dart:io';
 import 'package:test/test.dart';
 import 'package:kumiho/kumiho.dart';
 import 'package:kumiho/auth.dart';
+import 'package:kumiho/src/discovery.dart';
+
+/// Check if live integration tests should run.
+bool shouldRunLiveTests() {
+  return Platform.environment['KUMIHO_INTEGRATION_TEST'] == '1';
+}
 
 /// Generates a unique name with a prefix for test isolation.
 String uniqueName(String prefix) {
@@ -70,10 +76,16 @@ class TestCleanup {
 }
 
 void main() {
-  late KumihoClient client;
-  late TestCleanup cleanup;
+  final skipReason = shouldRunLiveTests()
+      ? null
+      : 'Live tests disabled. Set KUMIHO_INTEGRATION_TEST=1 to enable.';
+
+  KumihoClient? client;
+  TestCleanup? cleanup;
 
   setUpAll(() async {
+    if (skipReason != null) return;
+
     // Use the auth module to load token automatically
     // Priority: env var -> credentials file
     final token = await loadBearerToken();
@@ -86,29 +98,34 @@ void main() {
       );
     }
 
-    // Default to localhost for testing, can be overridden
-    final host = Platform.environment['KUMIHO_HOST'] ?? 'localhost';
-    final port = int.parse(Platform.environment['KUMIHO_PORT'] ?? '8080');
-    final secure = Platform.environment['KUMIHO_SECURE'] == 'true';
-
-    client = KumihoClient(
-      host: host,
-      port: port,
+    // Production-style flow: discover the correct data-plane via Control Plane.
+    // Uses:
+    // - Firebase ID token from ~/.kumiho/kumiho_authentication.json
+    // - Control plane URL from env / credentials defaults
+    // - server_url returned by /api/discovery/tenant
+    client = await clientFromDiscovery(
       token: token,
-      secure: secure,
+      forceRefresh: true,
     );
   });
 
   setUp(() {
-    cleanup = TestCleanup(client);
+    final active = client;
+    if (active == null) return;
+    cleanup = TestCleanup(active);
   });
 
   tearDown(() async {
-    await cleanup.cleanup();
+    final active = cleanup;
+    if (active == null) return;
+    await active.cleanup();
   });
 
   tearDownAll(() async {
-    await client.shutdownAsync();
+    if (skipReason != null) return;
+    final active = client;
+    if (active == null) return;
+    await active.shutdownAsync();
   });
 
   group('Full Creation Workflow', () {
@@ -143,7 +160,7 @@ void main() {
       expect(artifact.kref.uri, endsWith('&a=data'));
       expect(artifact.location, equals('/path/to/smoke_test.dat'));
     });
-  });
+  }, skip: skipReason);
 
   group('Artifact Operations', () {
     test('get_artifacts_by_location returns time-sorted list', () async {
@@ -176,7 +193,7 @@ void main() {
       final newest = foundArtifacts[0];
       expect(newest.kref.uri, equals(res2.kref.uri));
     });
-  });
+  }, skip: skipReason);
 
   group('Edge Workflow', () {
     test('creates and retrieves edges between revisions', () async {
@@ -206,7 +223,7 @@ void main() {
       expect(sourceEdges[0].targetKref.uri, equals(modelV1.kref.uri));
       expect(sourceEdges[0].edgeType, equals(EdgeType.dependsOn));
     });
-  });
+  }, skip: skipReason);
 
   group('Revision Operations', () {
     test('peek_next_revision works correctly', () async {
@@ -272,7 +289,33 @@ void main() {
       expect(latest2, isNotNull);
       expect(latest2!.number, equals(2));
     });
-  });
+
+    test('delete_latest_revision preserves latest resolution', () async {
+      final projectName = uniqueName('delete_latest_project');
+      final assetName = uniqueName('delete_latest_asset');
+      final project = await client.newProject(projectName);
+      cleanup.track(project);
+      final space = await project.createSpace(projectName);
+      cleanup.track(space);
+      final item = await space.createItem(assetName, 'rig');
+      cleanup.track(item);
+
+      final v1 = await item.createRevision();
+      cleanup.track(v1);
+      final v2 = await item.createRevision();
+
+      // Delete the revision that currently holds the server-managed 'latest' tag.
+      await client.deleteRevision(v2.kref.uri, force: true);
+
+      // 'latest' should now resolve to v1.
+      final resolved = await client.resolveKref(item.kref.uri, tag: 'latest');
+      expect(resolved.number, equals(1));
+
+      final latest = await item.getLatestRevision();
+      expect(latest, isNotNull);
+      expect(latest!.number, equals(1));
+    });
+  }, skip: skipReason);
 
   group('Tagging Workflow', () {
     test('full lifecycle of tagging a revision', () async {
@@ -306,7 +349,32 @@ void main() {
       final wasTaggedAfter = await client.wasTagged(v1.kref.uri, 'approved');
       expect(wasTaggedAfter, isTrue);
     });
-  });
+
+    test('published tag can be moved before deleting a revision', () async {
+      final project = await client.newProject(uniqueName('published_move_proj'));
+      cleanup.track(project);
+      final space = await project.createSpace(project.name);
+      cleanup.track(space);
+      final item = await space.createItem('hero', 'rig');
+      cleanup.track(item);
+
+      final v1 = await item.createRevision();
+      cleanup.track(v1);
+      final v2 = await item.createRevision();
+
+      // Publish v2.
+      await v2.tag('published');
+      expect(await client.hasTag(v2.kref.uri, 'published'), isTrue);
+
+      // Move published back to v1 (server enforces single active published tag).
+      await v1.tag('published');
+      expect(await client.hasTag(v1.kref.uri, 'published'), isTrue);
+      expect(await client.hasTag(v2.kref.uri, 'published'), isFalse);
+
+      // Now v2 is not published anymore and can be deleted.
+      await client.deleteRevision(v2.kref.uri, force: true);
+    });
+  }, skip: skipReason);
 
   group('Metadata Operations', () {
     test('setting and updating metadata on all object types', () async {
@@ -338,7 +406,7 @@ void main() {
       expect(updatedRevision.metadata['approved_by'], equals('lead'));
       expect(updatedArtifact.metadata['format'], equals('alembic'));
     });
-  });
+  }, skip: skipReason);
 
   group('Deprecation and Deletion', () {
     test('item deprecation workflow', () async {
@@ -364,7 +432,7 @@ void main() {
       final reloaded2 = await client.getItem(space.path, 'char', 'rig');
       expect(reloaded2.deprecated, isFalse);
     });
-  });
+  }, skip: skipReason);
 
   group('Navigation and Traversal', () {
     test('Janus parity: deprecation, default artifact, traversal', () async {
@@ -415,7 +483,7 @@ void main() {
       final spaceProject = await space.project;
       expect(spaceProject.name, equals(project.name));
     });
-  });
+  }, skip: skipReason);
 
   group('Edge Direction', () {
     test('edges with different directions', () async {
@@ -449,7 +517,7 @@ void main() {
       final bothV1 = await v1.getEdges(direction: EdgeDirection.BOTH);
       expect(bothV1.length, greaterThan(0));
     });
-  });
+  }, skip: skipReason);
 
   group('Item Search', () {
     test('search items with context and kind filter', () async {
@@ -477,7 +545,7 @@ void main() {
       final allItems = await client.searchItems(contextFilter: projectName);
       expect(allItems.length, greaterThanOrEqualTo(2));
     });
-  });
+  }, skip: skipReason);
 
   group('Published Revision Immutability', () {
     test('published revision and artifacts are immutable', () async {
@@ -518,5 +586,5 @@ void main() {
         throwsA(anything),
       );
     }, skip: 'Immutability rules may vary by server configuration');
-  });
+  }, skip: skipReason);
 }

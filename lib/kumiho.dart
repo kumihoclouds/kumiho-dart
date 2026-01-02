@@ -64,6 +64,7 @@
 /// | `KUMIHO_USE_CONTROL_PLANE_TOKEN` | Prefer CP token (true/false) |
 /// | `KUMIHO_ENABLE_AUTO_REFRESH` | Enable token auto-refresh (true/false) |
 /// | `KUMIHO_AUTH_TOKEN_GRACE_SECONDS` | Grace period before expiry (default: 300) |
+/// | `KUMIHO_CONTROL_PLANE_URL` | Control Plane base URL (preferred) |
 ///
 /// ## Key Concepts
 ///
@@ -106,6 +107,9 @@ export 'src/api/edge_api.dart' show EdgeType;
 export 'src/generated/kumiho.pb.dart' hide Kref, Edge;
 export 'src/generated/kumiho.pbenum.dart';
 export 'src/generated/kumiho.pbgrpc.dart' hide Kref, Edge;
+
+// Discovery bootstrap
+export 'discovery.dart';
 
 // Export model classes (Edge from models replaces protobuf Edge)
 export 'src/models/base.dart';

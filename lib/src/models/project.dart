@@ -214,6 +214,13 @@ class Project extends KumihoObject {
     return Project(response, client);
   }
 
+  /// Alias for [setPublic] using the allow_public terminology.
+  ///
+  /// This exists because assigning `project.allowPublic = true` is not possible
+  /// (the field is immutable) and callers often look for an explicit
+  /// `setAllowPublic(...)` method.
+  Future<Project> setAllowPublic(bool allowPublic) => setPublic(allowPublic);
+
   @override
   String toString() => "Project(name: '$name', id: '$projectId')";
 }

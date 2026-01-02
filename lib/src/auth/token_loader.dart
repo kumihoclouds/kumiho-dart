@@ -43,6 +43,11 @@ class AuthEnvVars {
 
   /// Control Plane API URL.
   static const String controlPlaneApiUrl = 'KUMIHO_CONTROL_PLANE_API_URL';
+
+  /// Control Plane base URL.
+  ///
+  /// This is the preferred env var name (parity with Python/C++).
+  static const String controlPlaneUrl = 'KUMIHO_CONTROL_PLANE_URL';
 }
 
 /// Default values for authentication.
@@ -56,10 +61,30 @@ class AuthDefaults {
   static const String firebaseApiKey = 'AIzaSyBFAo7Nv48xAvbN18rL-3W41Dqheporh8E';
 
   /// Default Control Plane API URL.
-  static const String controlPlaneApiUrl = 'https://kumiho.io';
+  static const String controlPlaneApiUrl = 'https://control.kumiho.cloud';
 
   /// Credentials filename.
   static const String credentialsFilename = 'kumiho_authentication.json';
+}
+
+/// Resolves the Control Plane base URL.
+///
+/// Priority:
+/// 1) `KUMIHO_CONTROL_PLANE_URL`
+/// 2) `KUMIHO_CONTROL_PLANE_API_URL` (legacy)
+/// 3) [AuthDefaults.controlPlaneApiUrl]
+String getControlPlaneUrl() {
+  final preferred = Platform.environment[AuthEnvVars.controlPlaneUrl];
+  if (preferred != null && preferred.trim().isNotEmpty) {
+    return preferred.trim();
+  }
+
+  final legacy = Platform.environment[AuthEnvVars.controlPlaneApiUrl];
+  if (legacy != null && legacy.trim().isNotEmpty) {
+    return legacy.trim();
+  }
+
+  return AuthDefaults.controlPlaneApiUrl;
 }
 
 /// Cached credentials from the kumiho-cli authentication.

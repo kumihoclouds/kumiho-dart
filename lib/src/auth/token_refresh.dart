@@ -93,7 +93,7 @@ Future<({String token, int expiresAt})?> exchangeForControlPlaneToken(
   String firebaseToken, {
   String? controlPlaneUrl,
 }) async {
-  final baseUrl = controlPlaneUrl ?? AuthDefaults.controlPlaneApiUrl;
+  final baseUrl = controlPlaneUrl ?? getControlPlaneUrl();
   final url = Uri.parse('$baseUrl/api/control-plane/token');
 
   try {

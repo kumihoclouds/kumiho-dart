@@ -43,6 +43,27 @@ void main() {
       expect(response.projects[1].name, equals('project-1'));
       expect(response.projects[2].name, equals('project-2'));
     });
+
+    test('Project.setAllowPublic calls updateProject', () async {
+      final calls = <Map<String, Object?>>[];
+
+      final fakeClient = _FakeProjectClient((projectId, {allowPublic, description}) {
+        calls.add({
+          'projectId': projectId,
+          'allowPublic': allowPublic,
+          'description': description,
+        });
+        return mockProjectResponse(projectId: projectId, name: 'demo', allowPublic: allowPublic ?? false);
+      });
+
+      final project = Project(mockProjectResponse(projectId: 'p1', name: 'demo', allowPublic: false), fakeClient);
+      final updated = await project.setAllowPublic(true);
+
+      expect(updated.allowPublic, isTrue);
+      expect(calls.length, equals(1));
+      expect(calls.single['projectId'], equals('demo'));
+      expect(calls.single['allowPublic'], equals(true));
+    });
   });
 
   group('Space API', () {
@@ -294,4 +315,22 @@ void main() {
       expect(pagedList.map((e) => e.toUpperCase()).toList(), equals(['A', 'B', 'C']));
     });
   });
+}
+
+class _FakeProjectClient {
+  _FakeProjectClient(this._updateProject);
+
+  final ProjectResponse Function(
+    String projectId, {
+    bool? allowPublic,
+    String? description,
+  }) _updateProject;
+
+  Future<ProjectResponse> updateProject(
+    String projectId, {
+    bool? allowPublic,
+    String? description,
+  }) async {
+    return _updateProject(projectId, allowPublic: allowPublic, description: description);
+  }
 }
